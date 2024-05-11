@@ -8,4 +8,8 @@ down:
 	docker compose down
 
 migrate:
-	docker compose exec app bash 
+	docker compose exec app alembic upgrade head
+
+fresh:
+	docker compose exec app alembic downgrade base
+	docker compose exec app alembic upgrade head
