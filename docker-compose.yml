@@ -9,7 +9,6 @@ services:
       - db
     env_file:
       - .env
-    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80", "--reload"]
 
   db:
     image: mysql:8.0

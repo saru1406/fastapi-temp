@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "code"
+version = "0.1.0"
+description = ""
+authors = ["yuta-saruwatari"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+fastapi = "^0.68.2"
+pydantic = "^1.10.15"
+uvicorn = "^0.15.0"
+sqlalchemy = "^2.0.27"
+greenlet = "^3.0.3"
+pymysql = "^1.1.0"
+alembic = "^1.13.1"
+python-dotenv = "^1.0.1"
+requests = "^2.31.0"
+black = "^24.8.0"
+isort = "^5.13.2"
+cryptography = "^43.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
