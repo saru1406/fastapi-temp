@@ -1,13 +1,14 @@
-from fastapi.middleware.cors import CORSMiddleware
-from .main import app
 from dotenv import load_dotenv
-import os
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app import get_env
 
 load_dotenv()
 
-origins = [
-    os.getenv("CORS"),
-]
+app = FastAPI()
+
+origins = [get_env.FRONT_URL, "http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,

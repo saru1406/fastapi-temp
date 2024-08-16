@@ -1,25 +1,22 @@
+from typing import List
+
 from sqlalchemy.orm import Session
 
-from app.Models.User import User
-from app.Schemas.UserSchema import UserSchemaCreate
+from app.models.user import User
+from app.schemas.user_schema import UserSchemaCreate
+
 
 class UserRepository:
-    def get_user(self, db: Session, user_id: int):
+    def find_user(self, db: Session, user_id: int) -> User:
         return db.query(User).filter(User.id == user_id).first()
 
-
-    def get_user_by_email(self, db: Session, email: str):
+    def find_user_by_email(self, db: Session, email: str) -> User:
         return db.query(User).filter(User.email == email).first()
 
-
-    def get_users(self, db: Session, skip: int = 0, limit: int = 100):
+    def fetch_users(self, db: Session, skip: int = 0, limit: int = 100) -> List[User]:
         return db.query(User).offset(skip).limit(limit).all()
 
-
-    def create_user(self, db: Session, user: UserSchemaCreate):
+    def store_user(self, db: Session, user: UserSchemaCreate) -> None:
         fake_hashed_password = user.password + "notreallyhashed"
         db_user = User(email=user.email, password=fake_hashed_password)
         db.add(db_user)
-        db.commit()
-        db.refresh(db_user)
-        return db_user

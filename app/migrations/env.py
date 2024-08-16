@@ -1,15 +1,10 @@
-import os
 from logging.config import fileConfig
 
 from alembic import context
-from dotenv import load_dotenv
 from sqlalchemy import create_engine, pool
-from sqlalchemy.engine.url import URL
 
+from app import get_env
 from app.database import Base
-
-# Load environment variables from .env file
-load_dotenv()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -27,7 +22,7 @@ if config.config_file_name is not None:
 target_metadata = Base.metadata
 
 # Getting the database URL from the environment variable
-database_url = f'mysql+pymysql://{os.getenv("DB_USER")}:{os.getenv("DB_PASSWORD")}@db/{os.getenv("DB_DATABASE")}?charset=utf8mb4'
+database_url = f"mysql+pymysql://{get_env.DB_USER}:{get_env.DB_PASSWORD}@db/{get_env.DB_DATABASE}?charset=utf8mb4"
 
 if not database_url:
     raise ValueError("No DATABASE_URL set for Alembic configuration")
