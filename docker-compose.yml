@@ -23,12 +23,10 @@ services:
       - ${DB_PORT}:3306
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./logs:/var/log/mysql
-      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
-    command: [
-      "--character-set-server=utf8mb4",
-      "--collation-server=utf8mb4_unicode_ci"
-    ]
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
 
 volumes:
   mysql_data:

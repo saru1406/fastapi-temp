@@ -28,3 +28,6 @@ history:
 format:
 	docker-compose exec app black .
 	docker-compose exec app isort .
+
+log:
+	docker logs fastapi-temp-app-1
