@@ -32,5 +32,8 @@ format:
 log:
 	docker logs fastapi-temp-app-1
 
-install:
+poetry-install:
 	docker compose exec app poetry install
+
+poetry-show:
+	docker compose exec app poetry show

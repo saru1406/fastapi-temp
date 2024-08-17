@@ -16,7 +16,6 @@ class UserRepository:
     def fetch_users(self, db: Session, skip: int = 0, limit: int = 100) -> List[User]:
         return db.query(User).offset(skip).limit(limit).all()
 
-    def store_user(self, db: Session, user: UserSchemaCreate) -> None:
-        fake_hashed_password = user.password + "notreallyhashed"
-        db_user = User(email=user.email, password=fake_hashed_password)
+    def store_user(self, db: Session, user: dict) -> None:
+        db_user = User(email=user["email"], password=user["password"])
         db.add(db_user)
