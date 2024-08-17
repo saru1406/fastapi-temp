@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app import get_env
+from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.services.user.user_service import UserService
 
@@ -43,17 +44,19 @@ class LoginUsecase:
         )
         return Token(access_token=access_token, token_type="bearer")
 
-    async def authenticate_user(self, db: Session, email: str, password: str):
+    async def authenticate_user(
+        self, db: Session, email: str, password: str
+    ) -> Union[None, User]:
         user = await self.user_repository.async_find_user_by_email(db=db, email=email)
         if not user:
-            return False
+            return None
         if not UserService.verify_password(password, user.password):
-            return False
+            return None
         return user
 
     def create_access_token(
         self, data: dict, expires_delta: Union[timedelta, None] = None
-    ):
+    ) -> str:
         to_encode = data.copy()
         if expires_delta:
             expire = datetime.now(timezone.utc) + expires_delta

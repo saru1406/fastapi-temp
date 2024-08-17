@@ -3,7 +3,6 @@ from typing import List
 from sqlalchemy.orm import Session
 
 from app.models.user import User
-from app.schemas.user_schema import UserSchemaCreate
 
 
 class UserRepository:
