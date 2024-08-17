@@ -4,18 +4,13 @@ from typing import Union
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app import get_env
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
+from app.schemas.token_schema import TokenSchema
 from app.services.user.user_service import UserService
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
 
 
 class LoginUsecase:
@@ -28,34 +23,45 @@ class LoginUsecase:
         self,
         db: Session,
         form_data: OAuth2PasswordRequestForm,
-    ) -> Token:
-        user = await self.authenticate_user(db, form_data.username, form_data.password)
+    ) -> TokenSchema:
+        user = await self.authenticate_user(
+            db=db, form_email=form_data.username, form_password=form_data.password
+        )
+        access_token_expires = self.token_expires()
+        access_token = self.create_access_token(
+            data={"sub": user.email, "user_id": user.id},
+            expires_delta=access_token_expires,
+        )
+        return TokenSchema(access_token=access_token, token_type="bearer")
+
+    async def authenticate_user(
+        self, db: Session, form_email: str, form_password: str
+    ) -> User:
+        user = await self.user_repository.async_find_user_by_email(
+            db=db, email=form_email
+        )
+        self.check_user(user=user)
+        self.check_password(form_password=form_password, user_password=user.password)
+        return user
+
+    def check_user(self, user: Union[None, User]):
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password",
+                detail="認証に失敗しました。",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-        access_token_expires = timedelta(
-            minutes=int(get_env.ACCESS_TOKEN_EXPIRE_MINUTES)
-        )
-        access_token = self.create_access_token(
-            data={"sub": user.email}, expires_delta=access_token_expires
-        )
-        return Token(access_token=access_token, token_type="bearer")
 
-    async def authenticate_user(
-        self, db: Session, email: str, password: str
-    ) -> Union[None, User]:
-        user = await self.user_repository.async_find_user_by_email(db=db, email=email)
-        if not user:
-            return None
-        if not UserService.verify_password(password, user.password):
-            return None
-        return user
+    def check_password(self, form_password, user_password) -> None:
+        if not UserService.verify_password(form_password, user_password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="認証に失敗しました。",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
 
     def create_access_token(
-        self, data: dict, expires_delta: Union[timedelta, None] = None
+        self, data: dict[str, str], expires_delta: Union[timedelta, None] = None
     ) -> str:
         to_encode = data.copy()
         if expires_delta:
@@ -67,3 +73,6 @@ class LoginUsecase:
             to_encode, get_env.SECRET_KEY, algorithm=get_env.ALGORITHM
         )
         return encoded_jwt
+
+    def token_expires(self) -> timedelta:
+        return timedelta(minutes=int(get_env.ACCESS_TOKEN_EXPIRE_MINUTES))

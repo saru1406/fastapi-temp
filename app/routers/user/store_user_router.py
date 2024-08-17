@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.repositories.user_repository import UserRepository
-from app.schemas.message import MessageSchemaBase
+from app.schemas.message_schema import MessageSchemaBase
 from app.schemas.user_schema import UserSchemaCreate
 from app.usecase.user.store_user_usecase import StoreUserUsecase
 
