@@ -19,3 +19,6 @@ class UserRepository:
     def store_user(self, db: Session, user: dict) -> None:
         db_user = User(email=user["email"], password=user["password"])
         db.add(db_user)
+
+    async def async_find_user_by_email(self, db: Session, email: str) -> User:
+        return db.query(User).filter(User.email == email).first()

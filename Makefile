@@ -37,3 +37,6 @@ poetry-install:
 
 poetry-show:
 	docker compose exec app poetry show
+
+secrets:
+	docker compose exec app python script.py
