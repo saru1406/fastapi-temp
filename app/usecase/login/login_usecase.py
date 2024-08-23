@@ -42,9 +42,10 @@ class LoginUsecase:
         )
         self.check_user(user=user)
         self.check_password(form_password=form_password, user_password=user.password)
+        self.check_active(user=user)
         return user
 
-    def check_user(self, user: Union[None, User]):
+    def check_user(self, user: Union[None, User]) -> None:
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -52,11 +53,19 @@ class LoginUsecase:
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-    def check_password(self, form_password, user_password) -> None:
+    def check_password(self, form_password: str, user_password: str) -> None:
         if not UserService.verify_password(form_password, user_password):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="認証に失敗しました。",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+    def check_active(self, user: User) -> None:
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="無効なアカウントです。",
                 headers={"WWW-Authenticate": "Bearer"},
             )
 

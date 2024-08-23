@@ -10,7 +10,7 @@ class UserSchemaCreate(UserSchemaBase):
 
 
 class UserSchema(UserSchemaBase):
-    id: int
+    id: str
     password: str
     is_active: bool
 
