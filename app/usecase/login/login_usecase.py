@@ -6,11 +6,12 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from app import get_env
+from app.emun.user_status import UserStatus
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
 from app.schemas.token_schema import TokenSchema
 from app.services.user.user_service import UserService
+from app.settings import env
 
 
 class LoginUsecase:
@@ -62,7 +63,7 @@ class LoginUsecase:
             )
 
     def check_active(self, user: User) -> None:
-        if not user.is_active:
+        if user.is_active == UserStatus.NOTACTIVE:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="無効なアカウントです。",
@@ -78,10 +79,8 @@ class LoginUsecase:
         else:
             expire = datetime.now(timezone.utc) + timedelta(minutes=15)
         to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(
-            to_encode, get_env.SECRET_KEY, algorithm=get_env.ALGORITHM
-        )
+        encoded_jwt = jwt.encode(to_encode, env.SECRET_KEY, algorithm=env.ALGORITHM)
         return encoded_jwt
 
     def token_expires(self) -> timedelta:
-        return timedelta(minutes=int(get_env.ACCESS_TOKEN_EXPIRE_MINUTES))
+        return timedelta(minutes=int(env.ACCESS_TOKEN_EXPIRE_MINUTES))

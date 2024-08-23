@@ -6,7 +6,7 @@ from app.models.user import User
 
 
 class UserRepository:
-    def find_user(self, db: Session, user_id: int) -> User:
+    def find_user(self, db: Session, user_id: str) -> User:
         return db.query(User).filter(User.id == user_id).first()
 
     def find_user_by_email(self, db: Session, email: str) -> User:
