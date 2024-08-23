@@ -1,21 +1,20 @@
 from typing import Union
 
-from fastapi import Depends, HTTPException, status
 import jwt
+from fastapi import Depends, HTTPException, status
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app import get_env
+from app.emun.user_status import UserStatus
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
-from app.emun.user_status import UserStatus
 
 
 class TokenData(BaseModel):
     user_email: Union[str, None] = None
-
 
 
 class UserService:
@@ -61,8 +60,8 @@ class UserService:
     def check_user(user: Union[User, None]) -> None:
         if user is None:
             raise UserService.credentials_exception
-    
-    @staticmethod    
+
+    @staticmethod
     def check_active(user: User) -> None:
         if user.is_active == UserStatus.NOTACTIVE:
             raise UserService.credentials_exception
